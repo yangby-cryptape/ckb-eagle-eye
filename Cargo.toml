@@ -5,6 +5,9 @@ authors = ["Boyu Yang <yangby@cryptape.com>"]
 edition = "2018"
 
 [dependencies]
-
-[badges]
-travis-ci = { repository = "yangby-cryptape/ckb-eagle-eye" }
+uckb-jsonrpc-client = { git = "https://github.com/unofficial-ckb/uckb-jsonrpc-sdk.git", rev = "a8316e2" }
+clap = { version = "~2.33", features = ["yaml"] }
+failure = "~0.1"
+log = "~0.4"
+pretty_env_logger = "~0.3"
+property = "~0.2"

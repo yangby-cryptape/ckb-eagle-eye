@@ -16,31 +16,34 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use std::{env, process, str};
+use std::io;
 
-mod arguments;
-mod error;
-mod issuance;
+use failure::Fail;
 
-fn main() {
-    {
-        let log_key = "CKB_EAGLE_EYE_LOG";
-        if env::var(log_key).is_err() {
-            let pkgname = env!("CARGO_PKG_NAME");
-            let log_value = format!("error,{}=trace", str::replace(pkgname, "-", "_"));
-            env::set_var(log_key, log_value);
+use uckb_jsonrpc_client::url;
+
+#[derive(Debug, Fail)]
+pub enum Error {
+    #[fail(display = "internal error: should be unreachable, {}", _0)]
+    Unreachable(String),
+
+    #[fail(display = "io error: {}", _0)]
+    IO(io::Error),
+    #[fail(display = "url error: {}", _0)]
+    Url(url::ParseError),
+}
+
+pub type Result<T> = ::std::result::Result<T, Error>;
+
+macro_rules! convert_error {
+    ($name:ident, $inner_error:ty) => {
+        impl ::std::convert::From<$inner_error> for Error {
+            fn from(error: $inner_error) -> Self {
+                Self::$name(error)
+            }
         }
-        pretty_env_logger::try_init_timed_custom_env(log_key).unwrap();
-    }
-    log::info!("Begin to inspect a CKB chain.");
-
-    if let Err(error) = execute() {
-        eprintln!("fatal: {}", error);
-        process::exit(1);
-    }
+    };
 }
 
-fn execute() -> error::Result<()> {
-    let args = arguments::build_commandline()?;
-    issuance::inspect(&args)
-}
+convert_error!(IO, io::Error);
+convert_error!(Url, url::ParseError);

@@ -1,0 +1,11 @@
+name: CKB Eagle Eye
+version: "0.1.0"
+about: |
+    [Unofficial & Experimental]
+author: Boyu Yang <yangby@cryptape.com>
+args:
+    - url:
+        help: Specify a HTTP address of a JSON-RPC server.
+        long: url
+        takes_value: true
+        required: true
